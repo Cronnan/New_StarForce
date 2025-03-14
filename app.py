@@ -18,6 +18,7 @@ if st.button("シミュレーション実行"):
     with st.spinner('シミュレーション中...'):
         cost_quantiles, destruction_quantiles = main(
             target_star_num=target_star_num,
+            equipment_level=equipment_level,
             penalty=penalty,
             simulation_num=simulation_num,
             shining_cost=shining_cost,
