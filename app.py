@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 from simulation_module import main
 
-st.title("スタフォシミュレーター")
+st.title("★30対応版- スタフォシミュレーター")
 
 # ユーザー入力（UIで設定可能）
 target_star_num = st.slider("目標スタフォ星数", 16, 30, 22)
