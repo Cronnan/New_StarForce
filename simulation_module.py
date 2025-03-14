@@ -60,6 +60,7 @@ def simulate_star_enhancement(start_star,
                               shining_cost=False,
                               shining_15to16=False,
                               shining_destroy=False,
+                              eighteen_protect=False,
                               seed=None,
                               verbose=False
                               ):
@@ -68,31 +69,38 @@ def simulate_star_enhancement(start_star,
     各試行は、現在の星に対応する成功率・維持率・破壊率で判定し、
       ・成功: 星が+1される
       ・維持: 星の数は変わらず（費用だけ消費）
-      ・破壊: 破壊ペナルティとして5000加算、星は15にリセット
+      ・破壊: 破壊ペナルティとして5000加算、星は15にリセット（※初回は start_star から開始）
     を行います。
+    
+    また、以下のオプションが利用可能です。
+      shining_cost: 費用計算の際に0.7倍する
+      shining_15to16: 星15の成功率を1.0、維持率と破壊率を0にする
+      shining_destroy: 全ての星で破壊率を0.7倍にし、減った分を維持率に加える
+      eighteen_protect: 星18になるまで破壊確率を0にし、その分を維持率に加える
     1000回のシミュレーション結果（合計費用、破壊回数）をリストとして返します。
     """
+    # DataFrame の作成（確率・費用の調整は make_df 内で実施）
     df = make_df(equipment_level=equipment_level,
                  shining_cost=shining_cost,
                  shining_15to16=shining_15to16,
                  shining_destroy=shining_destroy)
 
-
     if seed is not None:
         np.random.seed(seed)
 
     # DataFrameから各パラメータの配列を作成（星15～29が対応）
-    cost_arr      = df["費用(m)"].values
-    success_arr   = df["成功率"].values
-    maintain_arr  = df["維持率"].values
+    cost_arr       = df["費用(m)"].values
+    success_arr    = df["成功率"].values
+    maintain_arr   = df["維持率"].values
     destruction_arr = df["破壊率"].values
 
-    base_star = 15  # 破壊時の星
+    base_star = 15  # 破壊時のリセット先
     results = []
 
     for sim in range(simulations):
         if verbose:
             print(f"{sim}回目の挑戦です")
+        # 初回は start_star から開始
         current_star = start_star
         total_cost = 0
         destruction_count = 0
@@ -103,13 +111,24 @@ def simulate_star_enhancement(start_star,
             total_cost += cost_arr[idx]
 
             r = np.random.rand()
-            if r < success_arr[idx]:
+            # eighteen_protect オプションが有効で、星が18未満の場合、破壊確率を0にしてその分を維持率へ
+            if eighteen_protect and current_star < 18:
+                curr_success = success_arr[idx]
+                curr_maintain = maintain_arr[idx] + destruction_arr[idx]
+                curr_destruction = 0.0
+            else:
+                curr_success = success_arr[idx]
+                curr_maintain = maintain_arr[idx]
+                curr_destruction = destruction_arr[idx]
+
+            if r < curr_success:
                 current_star += 1
                 if verbose:
                     print(f"成功。星の数={current_star}")
-            elif r < success_arr[idx] + maintain_arr[idx]:
-                # 維持の場合は何もしない（費用は既に加算済み）
-                pass
+            elif r < curr_success + curr_maintain:
+                # 維持：星の数は変わらず
+                if verbose:
+                    print("維持。星の数は変わらず")
             else:
                 # 破壊の場合はペナルティ加算、カウンタ更新、星15にリセット
                 total_cost += penalty
@@ -121,6 +140,7 @@ def simulate_star_enhancement(start_star,
     return results
 
 
+
 def main(start_star_num=15,
          target_star_num=22, 
          equipment_level=250, 
@@ -128,7 +148,8 @@ def main(start_star_num=15,
          simulation_num=1000, 
          shining_cost=False, 
          shining_15to16=False, 
-         shining_destroy=False):
+         shining_destroy=False,
+         eighteen_protect=False):
 
     # 1000回のシミュレーション実行
     sim_results = simulate_star_enhancement(start_star=start_star_num,
@@ -138,7 +159,8 @@ def main(start_star_num=15,
                                             simulations=simulation_num,
                                             shining_cost=shining_cost,
                                             shining_15to16=shining_15to16,
-                                            shining_destroy=shining_destroy)
+                                            shining_destroy=shining_destroy,
+                                            eighteen_protect=eighteen_protect)
 
     # 結果をDataFrameに変換
     res_df = pd.DataFrame(sim_results, columns=["total_cost", "destruction_count"])

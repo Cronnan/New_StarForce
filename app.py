@@ -14,6 +14,7 @@ simulation_num = st.number_input("シミュレーション回数", value=1000)
 shining_cost = st.checkbox("スタフォ費用30%OFF", value=True)
 shining_15to16 = st.checkbox("15→16星 強化100%成功", value=True)
 shining_destroy = st.checkbox("破壊率30%軽減", value=True)
+eighteen_protect = st.checkbox("星18までの破壊防止", value=True)
 
 if st.button("シミュレーション実行"):
     with st.spinner('シミュレーション中...'):
@@ -25,7 +26,8 @@ if st.button("シミュレーション実行"):
             simulation_num=simulation_num,
             shining_cost=shining_cost,
             shining_15to16=shining_15to16,
-            shining_destroy=shining_cost
+            shining_destroy=shining_destroy,
+            eighteen_protect = eighteen_protect
         )
         
 
