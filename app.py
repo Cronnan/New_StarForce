@@ -80,9 +80,14 @@ if st.session_state.results_calculated:
     # テーブル表示
     st.dataframe(results_df, use_container_width=True, hide_index=True)
 
-    st.write("##### (参考)今回のスタフォテーブル")
-    st.session_state.cost_table["星"] = st.session_state.cost_table["星"].astype(str) + " → " + (st.session_state.cost_table["星"] + 1).astype(str)
+    cost_table_df = st.session_state.cost_table.copy()
+    # "星" 列の変換処理
+    cost_table_df["星"] = cost_table_df["星"].astype(int)
+    cost_table_df["星"] = cost_table_df["星"].astype(str) + " → " + (cost_table_df["星"].astype(int) + 1).astype(str)
+    # "成功率", "維持率", "破壊率" の変換処理
     for col in ["成功率", "維持率", "破壊率"]:
-        st.session_state.cost_table[col] = st.session_state.cost_table[col].mul(100).round(2).astype(str) + "%"
+        cost_table_df[col] = cost_table_df[col].mul(100).round(2).astype(str) + "%"
 
-    st.dataframe(st.session_state.cost_table, use_container_width=True, hide_index=True)
+    # テーブルを表示
+    st.write("##### (参考)今回のスタフォテーブル")
+    st.dataframe(cost_table_df, use_container_width=True, hide_index=True)
