@@ -11,9 +11,15 @@ st.set_page_config(
 
 # タイトル表示
 st.markdown("""
-<div style="text-align: center;">
-    <h1>スタフォシミュレーター</h1>
-    <p style="color: #FF69B4; margin-top: -0.5rem;">30星対応版</p>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap');
+.title-container {text-align: center;}
+.modern-title {font-family: 'M PLUS Rounded 1c', sans-serif; color: #FF6EC7; font-weight: 700; display: inline-block; margin-bottom: 5px;}
+.modern-subtitle {font-family: 'M PLUS Rounded 1c', sans-serif; color: #FF69B4; font-size: 1.2rem; text-align: center; display: block;}
+</style>
+<div class="title-container">
+    <h1 class="modern-title">スタフォシミュレーター</h1>
+    <p class="modern-subtitle">★ 30星対応版 ★</p>
 </div>
 """, unsafe_allow_html=True)
 
