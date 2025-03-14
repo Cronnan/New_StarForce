@@ -18,7 +18,12 @@ def compute_cost(star, equipment_level=250, shining_cost=False):
     return cost
 
 
-def make_df(equipment_level=250, shining_cost=False, shining_15to16=False, shining_destroy=False):
+def make_df(equipment_level=250, 
+            shining_cost=False, 
+            shining_15to16=False, 
+            shining_destroy=False,
+            catch_succeed=False):
+    
     stars = list(range(15, 30))
     # 各星に対して費用を計算（小数点以下は四捨五入して整数に）
     costs = [round(compute_cost(star, equipment_level, shining_cost=shining_cost)) for star in stars]
@@ -41,6 +46,14 @@ def make_df(equipment_level=250, shining_cost=False, shining_15to16=False, shini
         retention_rate[0] = 0.0
         destroy_rate[0] = 0.0
 
+    # catch_succeed のオプション: 全ての星で成功率を1.05倍にし、その分維持率を減少
+    if catch_succeed:
+        for i in range(len(stars)):
+            # 増加分
+            delta = success_rate[i] * 0.05
+            success_rate[i] *= 1.05
+            retention_rate[i] -= delta
+
     data = {
         "星": stars,
         "成功率": success_rate,
@@ -52,6 +65,7 @@ def make_df(equipment_level=250, shining_cost=False, shining_15to16=False, shini
     return df
 
 
+
 def simulate_star_enhancement(start_star,
                               target_star,
                               equipment_level=250,
@@ -61,6 +75,7 @@ def simulate_star_enhancement(start_star,
                               shining_15to16=False,
                               shining_destroy=False,
                               eighteen_protect=False,
+                              catch_succeed=False,
                               seed=None,
                               verbose=False
                               ):
@@ -83,7 +98,8 @@ def simulate_star_enhancement(start_star,
     df = make_df(equipment_level=equipment_level,
                  shining_cost=shining_cost,
                  shining_15to16=shining_15to16,
-                 shining_destroy=shining_destroy)
+                 shining_destroy=shining_destroy,
+                 catch_succeed=catch_succeed)
 
     if seed is not None:
         np.random.seed(seed)
@@ -149,7 +165,8 @@ def main(start_star_num=15,
          shining_cost=False, 
          shining_15to16=False, 
          shining_destroy=False,
-         eighteen_protect=False):
+         eighteen_protect=False,
+         catch_succeed=False):
 
     # 1000回のシミュレーション実行
     sim_results = simulate_star_enhancement(start_star=start_star_num,
@@ -160,7 +177,8 @@ def main(start_star_num=15,
                                             shining_cost=shining_cost,
                                             shining_15to16=shining_15to16,
                                             shining_destroy=shining_destroy,
-                                            eighteen_protect=eighteen_protect)
+                                            eighteen_protect=eighteen_protect,
+                                            catch_succeed=catch_succeed)
 
     # 結果をDataFrameに変換
     res_df = pd.DataFrame(sim_results, columns=["total_cost", "destruction_count"])
