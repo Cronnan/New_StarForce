@@ -18,10 +18,11 @@ def compute_cost(star, equipment_level=250, shining_cost=False):
     return cost
 
 
-def make_df(equipment_level=250, 
-            shining_cost=False, 
-            shining_15to16=False, 
+def make_star_table(equipment_level=250,
+            shining_cost=False,
+            shining_15to16=False,
             shining_destroy=False,
+            eighteen_protect=False,
             catch_succeed=False):
     
     stars = list(range(15, 30))
@@ -32,6 +33,14 @@ def make_df(equipment_level=250,
     success_rate = [0.30, 0.30, 0.15, 0.15, 0.15, 0.30, 0.15, 0.15, 0.10, 0.10, 0.10, 0.07, 0.05, 0.03, 0.01]
     retention_rate = [0.679, 0.679, 0.782, 0.782, 0.765, 0.595, 0.7225, 0.68, 0.72, 0.72, 0.72, 0.744, 0.76, 0.776, 0.792]
     destroy_rate = [0.021, 0.021, 0.068, 0.068, 0.085, 0.105, 0.1275, 0.17, 0.18, 0.18, 0.18, 0.186, 0.19, 0.194, 0.198]
+
+    # eighteen_protect のオプション: 星18未満の破壊率を0にし、その分を維持率に追加
+    if eighteen_protect:
+        for i in range(len(stars)):
+            if stars[i] < 18:
+                original_destruction = destroy_rate[i]
+                destroy_rate[i] = 0.0
+                retention_rate[i] += original_destruction
 
     # shining_destroy のオプション: 全ての星の破壊率を0.7倍にし、その分を維持率に追加
     if shining_destroy:
@@ -95,7 +104,7 @@ def simulate_star_enhancement(start_star,
     1000回のシミュレーション結果（合計費用、破壊回数）をリストとして返します。
     """
     # DataFrame の作成（確率・費用の調整は make_df 内で実施）
-    df = make_df(equipment_level=equipment_level,
+    df = make_star_table(equipment_level=equipment_level,
                  shining_cost=shining_cost,
                  shining_15to16=shining_15to16,
                  shining_destroy=shining_destroy,
@@ -110,8 +119,9 @@ def simulate_star_enhancement(start_star,
     maintain_arr   = df["維持率"].values
     destruction_arr = df["破壊率"].values
 
-    base_star = 15  # 破壊時のリセット先
+    base_star = df["星"].values[0]  # 破壊時のリセット先=15
     results = []
+
 
     for sim in range(simulations):
         if verbose:
@@ -127,15 +137,9 @@ def simulate_star_enhancement(start_star,
             total_cost += cost_arr[idx]
 
             r = np.random.rand()
-            # eighteen_protect オプションが有効で、星が18未満の場合、破壊確率を0にしてその分を維持率へ
-            if eighteen_protect and current_star < 18:
-                curr_success = success_arr[idx]
-                curr_maintain = maintain_arr[idx] + destruction_arr[idx]
-                curr_destruction = 0.0
-            else:
-                curr_success = success_arr[idx]
-                curr_maintain = maintain_arr[idx]
-                curr_destruction = destruction_arr[idx]
+            curr_success = success_arr[idx]
+            curr_maintain = maintain_arr[idx]
+            curr_destruction = destruction_arr[idx]
 
             if r < curr_success:
                 current_star += 1
@@ -153,7 +157,7 @@ def simulate_star_enhancement(start_star,
                 if verbose:
                     print("失敗。破壊されました")
         results.append((total_cost, destruction_count))
-    return results
+    return results, df
 
 
 
@@ -169,7 +173,7 @@ def main(start_star_num=15,
          catch_succeed=False):
 
     # 1000回のシミュレーション実行
-    sim_results = simulate_star_enhancement(start_star=start_star_num,
+    sim_results, df = simulate_star_enhancement(start_star=start_star_num,
                                             target_star=target_star_num,
                                             equipment_level=equipment_level,
                                             penalty=penalty,
@@ -187,6 +191,9 @@ def main(start_star_num=15,
     percentiles = [0, 25, 50, 75, 100]
     cost_quantiles = np.percentile(res_df["total_cost"], percentiles)
     destruction_quantiles = np.percentile(res_df["destruction_count"], percentiles)
+    # 平均値を計算
+    average_cost = res_df["total_cost"].mean()
+    average_destruction_count = res_df["destruction_count"].mean()
 
     quantile_df = pd.DataFrame({
     "percentile": percentiles,
@@ -196,4 +203,7 @@ def main(start_star_num=15,
 
     print("\nシミュレーション結果（四分位ごとの合計費用と破壊回数）:")
     print(quantile_df)
+
+    cost_quantiles = np.append(cost_quantiles, average_cost)
+    destruction_quantiles = np.append(destruction_quantiles, average_destruction_count)
     return cost_quantiles, destruction_quantiles

@@ -72,9 +72,9 @@ if st.session_state.results_calculated:
     
     # 結果データフレーム作成
     results_df = pd.DataFrame({
-        "パーセンタイル": ["最良", "Top25%", "中央値", "Top75%", "最悪"],
+        "パーセンタイル": ["最良", "Top25%", "中央値", "Top75%", "最悪", "平均(参考)"],
         "合計費用 (m)": [f"{int(cost):,} m" for cost in st.session_state.cost_quantiles],
-        "装備破壊回数": [f"{int(count)} 回" for count in st.session_state.destruction_quantiles]
+        "装備破壊回数": [f"{count:.1f} 回" for count in st.session_state.destruction_quantiles]
     })
     
     # テーブル表示
