@@ -52,7 +52,8 @@ def make_df(equipment_level=250, shining_cost=False, shining_15to16=False, shini
     return df
 
 
-def simulate_star_enhancement(target_star,
+def simulate_star_enhancement(start_star,
+                              target_star,
                               equipment_level=250,
                               penalty=5000,
                               simulations=1000,
@@ -86,13 +87,13 @@ def simulate_star_enhancement(target_star,
     maintain_arr  = df["維持率"].values
     destruction_arr = df["破壊率"].values
 
-    base_star = 15  # 初期の星
+    base_star = 15  # 破壊時の星
     results = []
 
     for sim in range(simulations):
         if verbose:
             print(f"{sim}回目の挑戦です")
-        current_star = base_star
+        current_star = start_star
         total_cost = 0
         destruction_count = 0
 
@@ -120,13 +121,18 @@ def simulate_star_enhancement(target_star,
     return results
 
 
-def main(target_star_num=22, equipment_level=250, penalty=5000, simulation_num=1000, shining_cost=False, shining_15to16=False, shining_destroy=False):
-    # ユーザーから目標星を入力（例：30）
-    target_star = target_star_num
-    print(target_star)
+def main(start_star_num=15,
+         target_star_num=22, 
+         equipment_level=250, 
+         penalty=5000, 
+         simulation_num=1000, 
+         shining_cost=False, 
+         shining_15to16=False, 
+         shining_destroy=False):
 
     # 1000回のシミュレーション実行
-    sim_results = simulate_star_enhancement(target_star=target_star,
+    sim_results = simulate_star_enhancement(start_star=start_star_num,
+                                            target_star=target_star_num,
                                             equipment_level=equipment_level,
                                             penalty=penalty,
                                             simulations=simulation_num,

@@ -5,6 +5,7 @@ from simulation_module import main
 st.title("★30対応版- スタフォシミュレーター")
 
 # ユーザー入力（UIで設定可能）
+start_star_num = st.slider("開始スタフォ星数", 16, 30, 22)
 target_star_num = st.slider("目標スタフォ星数", 16, 30, 22)
 equipment_level = st.slider("装備レベル", 100, 250, 250)
 penalty = st.number_input("装備破壊時のペナルティ(m)", value=5000)
@@ -17,6 +18,7 @@ shining_destroy = st.checkbox("破壊率30%軽減", value=True)
 if st.button("シミュレーション実行"):
     with st.spinner('シミュレーション中...'):
         cost_quantiles, destruction_quantiles = main(
+            start_star_num=start_star_num,
             target_star_num=target_star_num,
             equipment_level=equipment_level,
             penalty=penalty,
