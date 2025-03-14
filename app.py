@@ -39,9 +39,9 @@ penalty = st.number_input("装備破壊時のペナルティ(m)", value=5000)
 simulation_num = st.number_input("シミュレーション回数", value=1000)
 
 # オプション
-shining_cost = st.checkbox("スタフォ費用30%OFF", value=True)
-shining_15to16 = st.checkbox("15→16星 強化100%成功", value=True)
-shining_destroy = st.checkbox("破壊率30%軽減", value=True)
+shining_cost = st.checkbox("[シャイニング]スタフォ費用30%OFF", value=True)
+shining_15to16 = st.checkbox("[シャイニング]15→16星 強化100%成功", value=True)
+shining_destroy = st.checkbox("[シャイニング]破壊率30%DOWN", value=True)
 eighteen_protect = st.checkbox("星18までの破壊防止", value=True)
 catch_succeed = st.checkbox("スターキャッチ絶対成功", value=True)
 
