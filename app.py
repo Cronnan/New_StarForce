@@ -34,7 +34,7 @@ st.markdown("""
 # 主要設定
 start_star_num = st.slider("開始スタフォ星数", 15, 30, 17)
 target_star_num = st.slider("目標スタフォ星数", 16, 30, 22)
-equipment_level = st.slider("装備レベル", 100, 250, 250, step=10)
+equipment_level = st.slider("装備レベル", 100, 250, 200, step=10)
 penalty = st.number_input("装備破壊時のペナルティ(m)", value=5000)
 simulation_num = st.number_input("シミュレーション回数", value=1000)
 
@@ -48,7 +48,7 @@ catch_succeed = st.checkbox("スターキャッチ絶対成功", value=True)
 # シミュレーション実行関数
 def run_simulation():
     with st.spinner('シミュレーション中...'):
-        st.session_state.cost_quantiles, st.session_state.destruction_quantiles = main(
+        st.session_state.cost_quantiles, st.session_state.destruction_quantiles, st.session_state.cost_table = main(
             start_star_num=start_star_num,
             target_star_num=target_star_num,
             equipment_level=equipment_level,
@@ -79,3 +79,10 @@ if st.session_state.results_calculated:
     
     # テーブル表示
     st.dataframe(results_df, use_container_width=True, hide_index=True)
+
+    st.write("##### (参考)今回のスタフォテーブル")
+    st.session_state.cost_table["星"] = st.session_state.cost_table["星"].astype(str) + " → " + (st.session_state.cost_table["星"] + 1).astype(str)
+    for col in ["成功率", "維持率", "破壊率"]:
+        st.session_state.cost_table[col] = st.session_state.cost_table[col].mul(100).round(2).astype(str) + "%"
+
+    st.dataframe(st.session_state.cost_table, use_container_width=True, hide_index=True)

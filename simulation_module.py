@@ -60,8 +60,8 @@ def make_star_table(equipment_level=250,
         for i in range(len(stars)):
             # 増加分
             delta = success_rate[i] * 0.05
-            success_rate[i] *= 1.05
-            retention_rate[i] -= delta
+            success_rate[i] = min(success_rate[i] * 1.05, 1.00)
+            retention_rate[i] = max(retention_rate[i] - delta, 0)
 
     data = {
         "星": stars,
@@ -108,6 +108,7 @@ def simulate_star_enhancement(start_star,
                  shining_cost=shining_cost,
                  shining_15to16=shining_15to16,
                  shining_destroy=shining_destroy,
+                 eighteen_protect=eighteen_protect,
                  catch_succeed=catch_succeed)
 
     if seed is not None:
@@ -173,7 +174,7 @@ def main(start_star_num=15,
          catch_succeed=False):
 
     # 1000回のシミュレーション実行
-    sim_results, df = simulate_star_enhancement(start_star=start_star_num,
+    sim_results, cost_table = simulate_star_enhancement(start_star=start_star_num,
                                             target_star=target_star_num,
                                             equipment_level=equipment_level,
                                             penalty=penalty,
@@ -206,4 +207,4 @@ def main(start_star_num=15,
 
     cost_quantiles = np.append(cost_quantiles, average_cost)
     destruction_quantiles = np.append(destruction_quantiles, average_destruction_count)
-    return cost_quantiles, destruction_quantiles
+    return cost_quantiles, destruction_quantiles, cost_table
