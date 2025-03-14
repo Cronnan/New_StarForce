@@ -12,10 +12,9 @@ st.set_page_config(
 # タイトル表示
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap');
 .title-container {text-align: center;}
-.modern-title {font-family: 'M PLUS Rounded 1c', sans-serif; color: #FF6EC7; font-weight: 700; display: inline-block; margin-bottom: 5px;}
-.modern-subtitle {font-family: 'M PLUS Rounded 1c', sans-serif; color: #FF69B4; font-size: 1.2rem; text-align: center; display: block;}
+.modern-title {color: #FF6EC7; font-weight: 500; display: inline-block; margin-bottom: 5px;}
+.modern-subtitle {color: #FF69B4; font-size: 1.2rem; text-align: center; display: block;}
 </style>
 <div class="title-container">
     <h1 class="modern-title">スタフォシミュレーター</h1>
@@ -23,18 +22,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ユーザー入力（UIで設定可能）
-start_star_num = st.slider("開始スタフォ星数", 15, 30, 17)
-target_star_num = st.slider("目標スタフォ星数", 16, 30, 22)
-equipment_level = st.slider("装備レベル", 100, 250, 250, step=10)
-penalty = st.number_input("装備破壊時のペナルティ(m)", value=5000)
-simulation_num = st.number_input("シミュレーション回数", value=1000)
+# 方法1: カラムを使用して左右にスペースを作る
+left_space, center, right_space = st.columns([1, 18, 1])  # 左:中央:右の比率を調整できる
 
-shining_cost = st.checkbox("スタフォ費用30%OFF", value=True)
-shining_15to16 = st.checkbox("15→16星 強化100%成功", value=True)
-shining_destroy = st.checkbox("破壊率30%軽減", value=True)
-eighteen_protect = st.checkbox("星18までの破壊防止", value=True)
-catch_succeed = st.checkbox("スターキャッチ絶対成功", value=True)
+with center:
+    start_star_num = st.slider("開始スタフォ星数", 15, 30, 17)
+    target_star_num = st.slider("目標スタフォ星数", 16, 30, 22)
+    equipment_level = st.slider("装備レベル", 100, 250, 250, step=10)
+    penalty = st.number_input("装備破壊時のペナルティ(m)", value=5000)
+    simulation_num = st.number_input("シミュレーション回数", value=1000)
+
+    shining_cost = st.checkbox("スタフォ費用30%OFF", value=True)
+    shining_15to16 = st.checkbox("15→16星 強化100%成功", value=True)
+    shining_destroy = st.checkbox("破壊率30%軽減", value=True)
+    eighteen_protect = st.checkbox("星18までの破壊防止", value=True)
+    catch_succeed = st.checkbox("スターキャッチ絶対成功", value=True)
 
 if st.button("シミュレーション実行"):
     with st.spinner('シミュレーション中...'):
