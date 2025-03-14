@@ -5,7 +5,7 @@ from simulation_module import main
 st.title("★30対応版- スタフォシミュレーター")
 
 # ユーザー入力（UIで設定可能）
-start_star_num = st.slider("開始スタフォ星数", 16, 30, 22)
+start_star_num = st.slider("開始スタフォ星数", 15, 30, 17)
 target_star_num = st.slider("目標スタフォ星数", 16, 30, 22)
 equipment_level = st.slider("装備レベル", 100, 250, 250)
 penalty = st.number_input("装備破壊時のペナルティ(m)", value=5000)
