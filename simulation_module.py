@@ -34,21 +34,22 @@ def make_star_table(equipment_level=250,
     retention_rate = [0.679, 0.679, 0.782, 0.782, 0.765, 0.595, 0.7225, 0.68, 0.72, 0.72, 0.72, 0.744, 0.76, 0.776, 0.792]
     destroy_rate = [0.021, 0.021, 0.068, 0.068, 0.085, 0.105, 0.1275, 0.17, 0.18, 0.18, 0.18, 0.186, 0.19, 0.194, 0.198]
 
-    # eighteen_protect のオプション: 星18未満の破壊率を0にし、その分を維持率に追加
+    # eighteen_protect のオプション: 星18未満の破壊率を0&コスト2倍
     if eighteen_protect:
         for i in range(len(stars)):
             if stars[i] < 18:
                 original_destruction = destroy_rate[i]
                 destroy_rate[i] = 0.0
                 retention_rate[i] += original_destruction
+                costs[i] *= 2
 
     # shining_destroy のオプション: 全ての星の破壊率を0.7倍にし、その分を維持率に追加
     if shining_destroy:
         for i in range(len(stars)):
-            original_destroy = destroy_rate[i]
-            destroy_rate[i] = original_destroy * 0.7
-            retention_rate[i] += original_destroy * 0.3
-
+            if stars[i] < 22:
+                original_destroy = destroy_rate[i]
+                destroy_rate[i] = original_destroy * 0.7
+                retention_rate[i] += original_destroy * 0.3
     # shining_15to16 のオプション: 星15の成功率を1.0、維持率と破壊率を0に変更
     if shining_15to16:
         success_rate[0] = 1.0
